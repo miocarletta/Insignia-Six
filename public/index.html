@@ -1,35 +1,147 @@
 <!DOCTYPE html>
 <html lang="id">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-    <meta name="theme-color" content="#080b10" />
-    <meta name="description" content="Insignia Six - Saluran Terenkripsi" />
-    <meta name="mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="apple-mobile-web-app-title" content="InsigniaVI" />
-    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
-        <title>Insignia Six</title>
-    <style>
-      html, body {
-        height: 100dvh !important;
-        width: 100% !important;
-        margin: 0;
-        padding: 0;
-        overflow: hidden;
-        touch-action: manipulation;
-        background-color: #0a0a0a;
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Insignia Six</title>
+  <style>
+    /* Vibes Insignia Six: Misterius & Abu-abu Kebiruan */
+    body { 
+      background-color: #0b1016; 
+      color: #8b9eb5; 
+      font-family: 'Courier New', Courier, monospace; 
+      margin: 0; 
+      display: flex; 
+      flex-direction: column; 
+      height: 100vh; 
+      overflow: hidden;
+    }
+    .radar { 
+      padding: 20px; 
+      border-bottom: 1px solid #1c2735; 
+      background: #05080c; 
+      text-align: center; 
+      font-weight: bold; 
+      color: #4a6b8c; 
+      letter-spacing: 3px;
+      text-transform: uppercase;
+    }
+    .chat-box { 
+      flex: 1; 
+      overflow-y: auto; 
+      padding: 20px; 
+      display: flex; 
+      flex-direction: column; 
+      gap: 15px; 
+    }
+    .msg { 
+      background: #121922; 
+      border: 1px solid #1c2735; 
+      padding: 12px 18px; 
+      border-radius: 4px; 
+      width: fit-content; 
+      max-width: 85%; 
+      line-height: 1.5;
+    }
+    .sender {
+      color: #6a8caf;
+      font-weight: bold;
+      margin-right: 8px;
+    }
+    .input-area { 
+      display: flex; 
+      padding: 20px; 
+      background: #05080c; 
+      border-top: 1px solid #1c2735; 
+    }
+    input { 
+      flex: 1; 
+      padding: 12px; 
+      background: #0b1016; 
+      border: 1px solid #1c2735; 
+      color: #8b9eb5; 
+      outline: none; 
+      font-family: inherit;
+    }
+    button { 
+      background: #1c2735; 
+      color: #8b9eb5; 
+      border: 1px solid #2a3b4f; 
+      padding: 10px 25px; 
+      margin-left: 15px; 
+      cursor: pointer; 
+      font-family: inherit;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+    button:hover {
+      background: #2a3b4f;
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="radar">Insignia Six | Secure Channel</div>
+  
+  <div class="chat-box" id="chat"></div>
+  
+  <div class="input-area">
+    <input type="text" id="msgInput" placeholder="Masukkan pesan..." autocomplete="off">
+    <button onclick="sendMsg()">Kirim</button>
+  </div>
+
+  <script type="module">
+    // Modul Firebase langsung dari pusat (Tanpa Install)
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+    import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+    // KUNCI FIREBASE: Ganti tulisan di bawah dengan kunci asli dari Firebase-mu
+    const firebaseConfig = {
+      apiKey: "GANTI_DENGAN_API_KEY_ASLI",
+      authDomain: "insignia-six.firebaseapp.com",
+      projectId: "insignia-six",
+      storageBucket: "insignia-six.appspot.com",
+      messagingSenderId: "854049425936",
+      appId: "GANTI_DENGAN_APP_ID_ASLI"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const chatBox = document.getElementById("chat");
+    const msgInput = document.getElementById("msgInput");
+
+    // Sistem Penarik Chat Real-Time
+    const q = query(collection(db, "messages"), orderBy("timestamp", "asc"));
+    onSnapshot(q, (snapshot) => {
+      chatBox.innerHTML = "";
+      snapshot.forEach((doc) => {
+        const data = doc.data();
+        chatBox.innerHTML += `<div class="msg"><span class="sender">${data.sender || 'Mio'}:</span>${data.text}</div>`;
+      });
+      chatBox.scrollTop = chatBox.scrollHeight;
+    });
+
+    // Sistem Pengirim Chat
+    window.sendMsg = async () => {
+      if (!msgInput.value.trim()) return;
+      const text = msgInput.value;
+      msgInput.value = ""; // Kosongkan kolom langsung biar cepat
+      await addDoc(collection(db, "messages"), {
+        text: text,
+        sender: "Mio",
+        timestamp: serverTimestamp()
+      });
+    };
+
+    // Bisa kirim pakai tombol Enter
+    msgInput.addEventListener("keypress", function(event) {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        sendMsg();
       }
-      .main-container {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        display: flex;
-        flex-direction: column;
-      }
-      input { font-size: 16px !important; }
-    </style>
-  </head>
+    });
+  </script>
+</body>
+</html>

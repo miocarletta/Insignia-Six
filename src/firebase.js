@@ -2,12 +2,12 @@ import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
-  apiKey: "API_KEY_KAMU",
+  apiKey: "PASTE_API_KEY_ASLI_DISINI", 
   authDomain: "insignia-six.firebaseapp.com",
   projectId: "insignia-six",
   storageBucket: "insignia-six.appspot.com",
   messagingSenderId: "854049425936",
-  appId: "APP_ID_KAMU"
+  appId: "PASTE_APP_ID_ASLI_DISINI"
 };
 
 const app = initializeApp(firebaseConfig);

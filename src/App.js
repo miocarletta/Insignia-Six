@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
+import './App.css';
 import { db } from './firebase'; 
-import { collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } from 'firebase/firestore';
 
 function App() {
   const [messages, setMessages] = useState([]);

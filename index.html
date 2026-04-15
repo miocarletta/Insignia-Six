@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>INSIGNIA SIX v8.1 — LIVE OPERATIONS</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#01040a;--card:rgba(10,25,45,0.45);--border:rgba(74,142,219,0.2);--text:#e1e7f0;--accent:#00d4ff;--safe:#4de37d;--danger:#ff1f1f;--mio:#ffffff;--pena:#4a8edb;--vania:#8dcaff;--mizu:#acb9c9;--pulu:#4de37d;--al:#888888;}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;touch-action:manipulation;}
+html,body{height:100dvh;font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);overflow:hidden;position:fixed;width:100%;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;background-image:linear-gradient(rgba(0,212,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,212,255,.03) 1px,transparent 1px);background-size:30px 30px;z-index:0;}
+.loading-screen{position:fixed;inset:0;background:var(--bg);z-index:20000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;}
+.spinner{width:48px;height:48px;border:3px solid var(--border);border-top:3px solid var(--accent);border-radius:50%;animation:spin 1s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.loading-text{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--accent);letter-spacing:3px;animation:blink 1s ease-in-out infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:.3;}}
+.cyber-guard{position:fixed;top:8px;right:8px;width:160px;background:rgba(0,5,2,.96);border:1px solid var(--safe);font-family:'Share Tech Mono',monospace;font-size:7px;padding:7px;color:var(--safe);z-index:10000;border-radius:2px;overflow:hidden;transition:border-color .2s,color .2s;}
+.scan-line{width:100%;height:1px;background:var(--safe);opacity:.2;position:absolute;left:0;animation:scanMove 3s linear infinite;}
+@keyframes scanMove{0%{top:0;}100%{top:100%;}}
+.online-dots{display:flex;gap:3px;flex-wrap:wrap;margin-top:5px;}
+.o-dot{width:7px;height:7px;border-radius:50%;opacity:.2;transition:all .4s;flex-shrink:0;}
+.o-dot.on{opacity:1;box-shadow:0 0 5px currentColor;}
+.danger-overlay{position:fixed;inset:0;background:rgba(255,0,0,.08);z-index:9998;display:none;pointer-events:none;border:3px solid var(--danger);}
+.proximity-alert{position:fixed;top:16px;left:50%;transform:translateX(-50%) translateY(-80px);background:var(--danger);color:#fff;padding:8px 18px;border-radius:6px;font-family:'Share Tech Mono';font-size:11px;z-index:10001;transition:transform .3s;white-space:nowrap;}
+.proximity-alert.show{transform:translateX(-50%) translateY(0);}
+.notif-toast{position:fixed;top:56px;left:50%;transform:translateX(-50%) translateY(-100px);background:rgba(10,25,45,.96);border:1px solid var(--accent);border-radius:10px;padding:10px 16px;font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--accent);z-index:9999;transition:transform .3s;backdrop-filter:blur(10px);max-width:90vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.notif-toast.show{transform:translateX(-50%) translateY(0);}
+.screen{display:none;position:fixed;inset:0;z-index:10;flex-direction:column;align-items:center;justify-content:center;padding:16px;}
+.screen.active{display:flex;}
+.auth-wrap{background:var(--card);padding:28px 24px;border-radius:14px;width:min(320px,94vw);text-align:center;border:2px solid var(--accent);box-shadow:0 0 30px rgba(0,212,255,.15);backdrop-filter:blur(12px);}
+.auth-title{font-family:'Syne',sans-serif;font-weight:800;font-size:1.3rem;margin-bottom:6px;letter-spacing:2px;}
+.auth-sub{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--accent);margin-bottom:20px;letter-spacing:2px;}
+#agentSelect{width:100%;padding:12px;background:rgba(0,0,0,.4);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'Share Tech Mono',monospace;font-size:12px;margin-bottom:12px;outline:none;}
+#accessCode{width:100%;padding:14px;text-align:center;background:rgba(0,0,0,.5);border:1px solid var(--border);border-radius:6px;color:var(--accent);font-family:'Share Tech Mono',monospace;font-size:1.2rem;letter-spacing:6px;outline:none;margin-bottom:14px;}
+.btn-auth{width:100%;padding:14px;font-family:'Syne',sans-serif;font-weight:800;font-size:12px;letter-spacing:2px;border:1px solid var(--accent);background:rgba(0,212,255,.05);color:var(--accent);border-radius:6px;cursor:pointer;transition:all .2s;}
+.btn-auth:active{background:rgba(0,212,255,.15);}
+#authStatus{font-family:'Share Tech Mono',monospace;font-size:10px;min-height:16px;margin-top:8px;}
+#screenLobby{justify-content:flex-start;padding-top:20px;padding-left:180px;padding-right:180px;}
+.chat-wrap{width:min(420px,100%);height:100dvh;display:flex;flex-direction:column;padding:8px 0 0;}
+.lobby-header{display:flex;justify-content:space-between;align-items:center;padding:10px 0 8px;flex-shrink:0;}
+#myIdentity{font-family:'Syne',sans-serif;font-weight:800;font-size:15px;letter-spacing:1px;}
+.btn-terminate{background:none;border:none;color:var(--text);font-family:'Share Tech Mono',monospace;font-size:8px;opacity:.4;cursor:pointer;padding:4px 8px;}
+.chat-area{flex:1;background:var(--card);border-radius:12px;border:1px solid var(--border);overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px;backdrop-filter:blur(10px);-webkit-overflow-scrolling:touch;min-height:0;}
+.chat-area::-webkit-scrollbar{width:2px;}
+.chat-area::-webkit-scrollbar-thumb{background:var(--border);}
+.msg-bubble{padding:9px 13px;border-radius:4px 12px 12px 12px;font-size:13px;max-width:78%;line-height:1.5;border:1px solid rgba(255,255,255,.07);backdrop-filter:blur(5px);animation:msgIn .25s ease;word-break:break-word;}
+@keyframes msgIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+.msg-mine{align-self:flex-end;border-radius:12px 4px 12px 12px;}
+.msg-MIO{background:rgba(255,255,255,.05);border-color:var(--mio);}
+.msg-PENA{background:rgba(74,142,219,.1);border-color:var(--pena);}
+.msg-VANIA{background:rgba(141,202,255,.08);border-color:var(--vania);}
+.msg-MIZU{background:rgba(172,185,201,.08);border-color:var(--mizu);}
+.msg-PULU{background:rgba(77,227,125,.1);border-color:var(--pulu);}
+.msg-AL{background:rgba(136,136,136,.08);border-color:var(--al);}
+.msg-sender{font-size:8px;font-weight:bold;opacity:.5;margin-bottom:2px;}
+.msg-time{font-size:8px;opacity:.3;margin-top:3px;font-family:'Share Tech Mono',monospace;}
+.msg-mine .msg-time{text-align:right;}
+.typing-row{height:18px;font-family:'Share Tech Mono',monospace;font-size:9px;color:var(--accent);opacity:.6;flex-shrink:0;padding:2px 0;}
+.call-row{display:flex;gap:8px;margin:8px 0;flex-shrink:0;}
+.btn-call{flex:1;padding:10px;font-family:'Syne',sans-serif;font-weight:800;font-size:9px;letter-spacing:1px;border:1px solid var(--border);background:none;color:var(--text);border-radius:4px;cursor:pointer;transition:all .15s;}
+.btn-call:active{background:rgba(255,255,255,.06);}
+.btn-call.active-call{border-color:var(--safe)!important;color:var(--safe)!important;background:rgba(77,227,125,.1)!important;}
+.btn-call.public-call{border-color:rgba(0,212,255,.3);color:var(--accent);}
+.input-row{display:flex;gap:8px;align-items:center;flex-shrink:0;padding-bottom:env(safe-area-inset-bottom,4px);}
+#msgInput{flex:1;background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:6px;padding:13px 14px;color:#fff;outline:none;font-family:'Share Tech Mono',monospace;font-size:13px;transition:border-color .2s;}
+#msgInput:focus{border-color:rgba(0,212,255,.4);}
+.btn-send{width:46px;height:46px;border-radius:50%;background:var(--accent);color:var(--bg);border:none;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 0 16px rgba(0,212,255,.4);flex-shrink:0;}
+.btn-send:active{transform:scale(.92);}
+#radarContainer{position:fixed;top:20px;left:20px;width:150px;height:150px;z-index:1000;display:none;}
+.radar-ring{width:100%;height:100%;border:2px solid var(--accent);border-radius:50%;position:relative;background:radial-gradient(circle,rgba(0,212,255,.1) 0%,transparent 70%);animation:radarPulse 2s infinite;}
+@keyframes radarPulse{0%{box-shadow:0 0 0 0 rgba(0,212,255,.5);}70%{box-shadow:0 0 0 15px rgba(0,212,255,0);}100%{box-shadow:0 0 0 0 rgba(0,212,255,0);}}
+.radar-sweep{position:absolute;top:50%;left:50%;width:50%;height:1px;background:linear-gradient(90deg,transparent,var(--accent));transform-origin:left center;animation:sweep 3s linear infinite;}
+@keyframes sweep{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
+.radar-dot{position:absolute;width:8px;height:8px;border-radius:50%;transform:translate(-50%,-50%);box-shadow:0 0 6px currentColor;transition:all .5s;}
+.radar-info{font-family:'Share Tech Mono',monospace;font-size:7px;color:var(--accent);margin-top:4px;text-align:center;}
+#callBubble{position:fixed;bottom:24px;right:20px;width:72px;height:72px;border-radius:50%;background:var(--safe);display:none;align-items:center;justify-content:center;font-size:22px;z-index:1000;border:3px solid rgba(255,255,255,.3);box-shadow:0 0 28px var(--safe);cursor:pointer;}
+.danger-msg{color:var(--danger)!important;font-weight:bold;text-shadow:0 0 5px var(--danger);}
+</style>
+</head>
+<body>
+<div class="loading-screen" id="loadingScreen"><div class="spinner"></div><div class="loading-text">INITIALIZING INSIGNIA v8.1...</div></div>
+<div class="danger-overlay" id="dangerOverlay"></div>
+<div class="proximity-alert" id="proximityAlert">⚠️ AGENT NEARBY — <span id="alertDist">0m</span></div>
+<div class="notif-toast" id="notifToast"></div>
+<div class="cyber-guard" id="cyberGuard">
+  <div class="scan-line"></div>
+  <div style="border-bottom:1px solid rgba(77,227,125,.2);margin-bottom:4px;font-weight:bold;letter-spacing:1px;">INSIGNIA v8.1</div>
+  <div id="logLines"><div>> BOOT: OK</div><div>> AUTH: SECURE</div><div>> SYNC: STANDBY</div></div>
+  <div class="online-dots" id="onlineDots"></div>
+</div>
+<div id="radarContainer">
+  <div class="radar-ring">
+    <div class="radar-sweep"></div>
+    <div id="radarDots"></div>
+  </div>
+  <div class="radar-info">
+    <div id="gpsStatus">GPS: INIT</div>
+    <div id="agentCount">AGENTS: 0</div>
+    <div id="nearestAgent">NEAREST: --</div>
+  </div>
+</div>
+<div id="callBubble" onclick="IS.endCall()">📵</div>
+<div class="screen active" id="screenLogin">
+  <div class="auth-wrap">
+    <div class="auth-title">⬡ INSIGNIA SIX</div>
+    <div class="auth-sub">AGENT AUTHORIZATION v8.1</div>
+    <select id="agentSelect"><option value="">— SELECT OPERATIVE —</option></select>
+    <input type="password" id="accessCode" placeholder="ACCESS CODE" maxlength="10" autocomplete="off">
+    <button class="btn-auth" onclick="IS.auth()">AUTHORIZE ACCESS</button>
+    <div id="authStatus"></div>
+  </div>
+</div>
+<div class="screen" id="screenLobby">
+  <div class="chat-wrap">
+    <div class="lobby-header">
+      <div id="myIdentity">ID: —</div>
+      <button class="btn-terminate" onclick="IS.logout()">[ TERMINATE ]</button>
+    </div>
+    <div class="chat-area" id="chatArea"></div>
+    <div class="typing-row" id="typingRow"></div>
+    <div class="call-row">
+      <button class="btn-call" id="btnPrivate" onclick="IS.call(false)">🔒 PRIVATE CALL</button>
+      <button class="btn-call public-call" id="btnPublic" onclick="IS.call(true)">📡 PUBLIC CALL</button>
+    </div>
+    <div class="input-row">
+      <input type="text" id="msgInput" placeholder="TRANSMIT SECURE DATA..." autocomplete="off" maxlength="500">
+      <button class="btn-send" onclick="IS.send()">➤</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js';
+import { getDatabase, ref, push, set, onChildAdded, onDisconnect, serverTimestamp, query, orderByChild, limitToLast, onValue }
+  from 'https://www.gstatic.com/firebasejs/10.13.1/firebase-database.js';
+import { getAuth, signInAnonymously }
+  from 'https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyB0SmjlOOC2c2FWOciH5e_tOQXTdsKtT6w",
+  authDomain: "insignia-six-7aaf5.firebaseapp.com",
+  databaseURL: "https://insignia-six-7aaf5-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "insignia-six-7aaf5",
+  storageBucket: "insignia-six-7aaf5.firebasestorage.app",
+  messagingSenderId: "327086889647",
+  appId: "1:327086889647:web:5739001980d01a3ced925a"
+};
+
+const fbApp = initializeApp(firebaseConfig);
+const db = getDatabase(fbApp);
+const auth = getAuth(fbApp);
+
+const AGENTS = {
+  MIO:  {code:'I.S-01',color:'#ffffff',sym:'◎',tones:[1046.5,1318.5],lat:-3.5952,lng:98.6728},  // Medan
+  PENA: {code:'I.S-02',color:'#4a8edb',sym:'△',tones:[130.8,164.8],lat:-2.9761,lng:104.7454}, // Palembang
+  VANIA:{code:'I.S-03',color:'#8dcaff',sym:'◈',tones:[523.25,659.25],lat:1.2933,lng:132.4522}, // Sorong
+  MIZU: {code:'I.S-04',color:'#acb9c9',sym:'〜',tones:[440,440],lat:-2.9761,lng:104.7454},    // Palembang
+  PULU: {code:'I.S-05',color:'#4de37d',sym:'⬡',tones:[392,493.88],lat:-6.2088,lng:106.8456}, // Jakarta
+  AL:   {code:'I.S-06',color:'#888888',sym:'□', tones:[110,146.8],lat:-0.4833,lng:112.4333}  // Sanggau
+};
+
+let myID=null,audioCtx=null,presRef=null,peer=null,activeCall=null,localStream=null;
+let typingTimer=null,watchId=null,myPos=null,msgCount=0,peerConnections={};
+
+const IS = window.IS = {
+  async init
